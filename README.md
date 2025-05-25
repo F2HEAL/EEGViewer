@@ -36,7 +36,7 @@ python eeg_viewer_main.py --serial-port COM5 --board-id 17
 python eeg_viewer_main.py --playback-file path/to/data.csv --board-id 17
 ```
 
-> 📌 `--board-id` should match the device used to record the data. Use `--board-id 17` for Cyton.
+> 📌 `--board-id` should match the device used to record the data. Use `--board-id 17` for FreeEEG32.
 
 ---
 
