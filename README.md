@@ -70,18 +70,78 @@ python eeg_viewer_main.py --playback-file path/to/data.csv --board-id 17
 - Customize bandpass frequency range.
 
 ---
+## 🧪 Signal Quality & Diagnostics – In Detail
 
-## 🧪 Signal Quality & Diagnostics
+Each EEG channel shows two status lines:
 
-Each channel displays two label rows:
+### 🟦 Line 1: Signal Statistics
 
-- **Row 1 (Signal Stats)**:
-  - Peak-to-Peak (PTP), RMS, DC offset, flatness, kurtosis, skewness, and a status label.
-  - Statuses include: `OK`, `NOISY`, `FLAT`, `SPIKY`, `HIGH RMS`.
+| Metric | Description | Good Range (Typical) | Interpretation |
+|--------|-------------|----------------------|----------------|
+| **PTP (Peak-to-Peak)** | Max - Min value over the window. Reflects amplitude. | **10–1000 μV** | Too low → flat or disconnected; too high → motion/noise artifacts. |
+| **RMS (Root Mean Square)** | Power of the signal. Related to signal intensity. | **10–100 μV** | Too high → muscle noise; too low → weak contact or bad channel. |
+| **DC (Offset)** | Mean signal level. Not informative in AC-coupled systems. | ~**0 μV** (± few μV) | High offset might suggest drift or poor connection. |
+| **Flat** | % of samples with tiny variation (Δ < 3μV). Measures inactivity. | **< 0.95 (i.e., <95%)** | High flatness = flatlined channel (disconnected/shorted). |
+| **Kurtosis** | Measures "spikiness" — extreme outliers. | **< 10** | High kurtosis → spike artifacts (e.g., eye blinks, muscle spikes). |
+| **Skewness** | Asymmetry of the waveform. | **-2 to +2** | Very high/low → unusual or non-biological patterns. |
 
-- **Row 2 (Spectral Features)**:
-  - Line Noise Ratio (LNR), Muscle Ratio (MR), Spectral Entropy, Band Power values.
-  - Status includes `HUMAN EEG ALIKE`, `RANDOM NOISE ALIKE`.
+#### ➕ Status Tag Examples
+
+- **OK**: All metrics in acceptable range.
+- **FLAT**: Flatness > 0.95 or PTP < 10 → likely disconnected.
+- **NOISY**: PTP > 1000 → possibly muscle/EMG/motion artifact.
+- **SPIKY**: Kurtosis > 10 → sharp transients, maybe eye/muscle artifacts.
+- **HIGH RMS**: RMS > 100 → possibly muscle tension.
+
+### 🟥 Line 2: Frequency & Spectral Quality
+
+| Metric | Description | Good Range (Typical) | Interpretation |
+|--------|-------------|----------------------|----------------|
+| **LNR (Line Noise Ratio)** | Power at 50 Hz / total power. | **< 0.2** (Europe) | Higher → power line interference (electrical noise). |
+| **MR (Muscle Ratio)** | Gamma / (Alpha+Beta). | **< 1.0** | Higher → excessive gamma = EMG artifact. |
+| **Entropy** | Spectral entropy (flatness of spectrum). | **2.5 – 4.8** | Low = structured (e.g., EEG); high = noise/random. |
+
+### 🧠 Band Power Levels
+
+These give relative power in each EEG band:
+
+| Band | Range (Hz) | What it indicates |
+|------|------------|-------------------|
+| **δ (Delta)** | 1–4 Hz | Deep sleep or brain injury. |
+| **θ (Theta)** | 4–8 Hz | Drowsiness, meditation. |
+| **α (Alpha)** | 8–13 Hz | Relaxed wakefulness, closed eyes. |
+| **β (Beta)** | 13–20 Hz | Alertness, problem-solving. |
+| **h-β (High Beta)** | 20–30 Hz | Stress, tension. |
+| **γ (Gamma)** | 30–60 Hz | High-level cognition, sensory binding. |
+| **h-γ (High Gamma)** | 60–100 Hz | Possible EMG artifact or high attention load. |
+
+These are normalized to total power and shown in a bar chart.
+
+### ✅ Summary of Healthy EEG Ranges
+
+| Parameter      | Typical EEG Signal |
+|----------------|---------------------|
+| PTP            | 50–100 μV           |
+| RMS            | 10–50 μV            |
+| DC Offset      | ~0 μV               |
+| Flatness       | < 0.8               |
+| Kurtosis       | ~3–8                |
+| Skewness       | -2 to +2            |
+| LNR            | < 0.2               |
+| MR             | < 1.0               |
+| Entropy        | 2.5–4.8             |
+
+### 🧠 Common Artifacts You Might See
+
+| Artifact Type    | Indicators |
+|------------------|-----------|
+| **Loose electrode** | Flat signal (Flat > 0.95, low PTP/RMS) |
+| **Muscle noise (EMG)** | High RMS, high gamma/h-gamma, high MR |
+| **Power line noise** | High LNR at 50/60 Hz |
+| **Eye blink / movement** | High kurtosis and skewness, transient spikes |
+| **Disconnected sensor** | Flat + PTP near 0 μV |
+
+---
 
 ---
 
